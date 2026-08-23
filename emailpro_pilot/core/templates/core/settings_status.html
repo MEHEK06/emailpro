@@ -1,0 +1,72 @@
+{% extends "core/base.html" %}
+{% block title %}Settings · EmailPro Pilot{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card p-4">
+            <h4 class="mb-3">Configuration status</h4>
+            <p class="text-secondary">
+                All configuration comes from environment variables. This screen shows
+                whether each piece is set — it never displays secret values.
+            </p>
+
+            <table class="table table-dark">
+                <tbody>
+                    <tr>
+                        <td>Gemini API key</td>
+                        <td>
+                            {% if gemini_configured %}
+                                <span class="config-ok">✔ Configured</span>
+                            {% else %}
+                                <span class="config-missing">✘ Not set (GEMINI_API_KEY)</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Gemini model</td>
+                        <td>{{ gemini_model }}</td>
+                    </tr>
+                    <tr>
+                        <td>Gmail address</td>
+                        <td>
+                            {% if gmail_address_set %}
+                                <span class="config-ok">✔ Configured</span>
+                            {% else %}
+                                <span class="config-missing">✘ Not set (GMAIL_ADDRESS)</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Gmail app password</td>
+                        <td>
+                            {% if gmail_configured %}
+                                <span class="config-ok">✔ Configured</span>
+                            {% else %}
+                                <span class="config-missing">✘ Not set (GMAIL_APP_PASSWORD)</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Sender name</td>
+                        <td>{{ sender_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Send rate limit</td>
+                        <td>{{ send_rate_per_minute }} emails / minute</td>
+                    </tr>
+                    <tr>
+                        <td>Database engine</td>
+                        <td>{{ database_engine }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="text-secondary small mb-0">
+                Update these in your <code>.env</code> file (see <code>.env.example</code>)
+                or your host's environment variable settings, then restart the app and
+                Celery workers.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

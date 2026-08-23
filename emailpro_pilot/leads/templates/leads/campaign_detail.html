@@ -1,0 +1,37 @@
+{% extends "core/base.html" %}
+{% block title %}{{ campaign.subject }} · Lead Outreach{% endblock %}
+{% block content %}
+<div class="card p-4 mb-4" {% if campaign.status == "queued" or campaign.status == "sending" %}hx-get="{% url 'leads:campaign_detail' campaign.pk %}" hx-trigger="load delay:3s" hx-select="#campaign-body" hx-target="#campaign-body" hx-swap="outerHTML"{% endif %}>
+    <div id="campaign-body">
+        <h4>{{ campaign.subject }} <span class="badge bg-secondary">{{ campaign.get_status_display }}</span></h4>
+        <p class="text-secondary">{{ campaign.is_bulk|yesno:"Bulk campaign,Individual send" }} · Created {{ campaign.created_at }}</p>
+
+        <div class="row g-3 my-2">
+            <div class="col-6 col-md-3"><div class="text-secondary small">Recipients</div><div class="fs-4">{{ campaign.recipient_count }}</div></div>
+            <div class="col-6 col-md-3"><div class="text-secondary small">Sent</div><div class="fs-4">{{ campaign.sent_count }}</div></div>
+            <div class="col-6 col-md-3"><div class="text-secondary small">Failed</div><div class="fs-4">{{ campaign.failed_count }}</div></div>
+        </div>
+
+        {% if campaign.status == "queued" or campaign.status == "sending" %}
+            <div class="text-secondary small mb-3">Sending in the background — this page refreshes automatically…</div>
+        {% endif %}
+
+        <table class="table table-dark table-hover align-middle">
+            <thead><tr><th>Email</th><th>Status</th><th>Attempts</th><th>Sent at</th><th>Error</th></tr></thead>
+            <tbody>
+            {% for d in deliveries %}
+                <tr>
+                    <td>{{ d.email }}</td>
+                    <td><span class="badge badge-{{ d.status }}">{{ d.get_status_display }}</span></td>
+                    <td>{{ d.attempts }}</td>
+                    <td>{{ d.sent_at|default:"—" }}</td>
+                    <td class="small text-danger">{{ d.error_message|truncatechars:80 }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-secondary">No deliveries queued yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

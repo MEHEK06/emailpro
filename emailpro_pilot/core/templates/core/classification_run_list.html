@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+{% block title %}Classification runs · EmailPro Pilot{% endblock %}
+{% block content %}
+<h4 class="mb-3">Classification runs</h4>
+<table class="table table-dark table-hover align-middle">
+    <thead><tr><th>#</th><th>Status</th><th>Total</th><th>Business</th><th>Individual</th><th>Unclassified</th><th>Started</th></tr></thead>
+    <tbody>
+    {% for r in runs %}
+        <tr>
+            <td><a href="{% url 'core:classification_run_detail' r.pk %}">{{ r.pk }}</a></td>
+            <td><span class="badge bg-secondary">{{ r.get_status_display }}</span></td>
+            <td>{{ r.total_contacts }}</td>
+            <td>{{ r.classified_business }}</td>
+            <td>{{ r.classified_individual }}</td>
+            <td>{{ r.left_unclassified }}</td>
+            <td>{{ r.created_at }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="7" class="text-secondary">No classification runs yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

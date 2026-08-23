@@ -1,0 +1,36 @@
+{% extends "core/base.html" %}
+{% block title %}New campaign · EmailPro Pilot{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h4 class="mb-3">Compose campaign</h4>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Subject</label>
+                    {{ form.subject }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Message (HTML)</label>
+                    {{ form.body_html }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Plain-text version (optional)</label>
+                    {{ form.body_text }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Segment</label>
+                    {{ form.segment }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Attachment (optional)</label>
+                    {{ form.attachment }}
+                    {% if form.attachment.errors %}<div class="text-danger small">{{ form.attachment.errors }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">Continue to review</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

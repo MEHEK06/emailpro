@@ -1,0 +1,40 @@
+{% extends "core/base.html" %}
+{% block title %}Review campaign · EmailPro Pilot{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h4 class="mb-3">Review before sending</h4>
+
+            {% if not gmail_ready %}
+            <div class="alert alert-warning">
+                Gmail sending isn't configured yet. Set <code>GMAIL_ADDRESS</code> and
+                <code>GMAIL_APP_PASSWORD</code> in your environment, then come back here.
+                See the <a href="{% url 'core:settings_status' %}">Settings</a> page.
+            </div>
+            {% endif %}
+
+            <dl class="row">
+                <dt class="col-sm-3">Subject</dt><dd class="col-sm-9">{{ campaign.subject }}</dd>
+                <dt class="col-sm-3">Segment</dt><dd class="col-sm-9">{{ campaign.get_segment_display }}</dd>
+                <dt class="col-sm-3">Attachment</dt><dd class="col-sm-9">{{ campaign.attachment|default:"None" }}</dd>
+                <dt class="col-sm-3">Recipient count</dt>
+                <dd class="col-sm-9"><strong>{{ preview_count }}</strong> contact(s) will receive this campaign.</dd>
+            </dl>
+
+            <div class="border rounded p-3 mb-3">
+                <div class="text-secondary small mb-1">Message preview</div>
+                {{ campaign.body_html|safe }}
+            </div>
+
+            <form method="post" onsubmit="return confirm('This will send a real email to {{ preview_count }} recipient(s). Continue?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" {% if preview_count == 0 or not gmail_ready %}disabled{% endif %}>
+                    Confirm &amp; send campaign
+                </button>
+                <a href="{% url 'core:campaign_create' %}" class="btn btn-outline-light">Back to edit</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

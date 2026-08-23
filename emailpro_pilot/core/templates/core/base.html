@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}EmailPro Pilot{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg border-bottom navbar-dark">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand fw-semibold" href="{% url 'core:dashboard' %}">📧 EmailPro Pilot</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:dashboard' %}">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:upload_csv' %}">Upload CSV</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:contacts_list' %}">Contacts</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:classification_run_list' %}">Classification</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:campaign_list' %}">Campaigns</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'core:settings_status' %}">Settings</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'leads:dashboard' %}">Lead Outreach</a></li>
+            </ul>
+            {% if request.user.is_authenticated %}
+            <span class="navbar-text small text-secondary">Signed in as {{ request.user }}</span>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4 py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

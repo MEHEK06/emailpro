@@ -1,0 +1,39 @@
+:root {
+    --ep-bg: #0f1115;
+    --ep-surface: #161a21;
+    --ep-border: #262b34;
+    --ep-accent: #6ea8fe;
+}
+
+body {
+    background-color: var(--ep-bg);
+}
+
+.navbar {
+    background-color: var(--ep-surface);
+}
+
+.card, .table {
+    background-color: var(--ep-surface);
+    border-color: var(--ep-border);
+}
+
+.card {
+    border: 1px solid var(--ep-border);
+    border-radius: 0.75rem;
+}
+
+.stat-card .display-6 {
+    font-weight: 600;
+}
+
+.badge-business { background-color: #3b6fd6 !important; }
+.badge-individual { background-color: #2f9e64 !important; }
+.badge-unclassified { background-color: #6b7280 !important; }
+
+.badge-sent { background-color: #2f9e64 !important; }
+.badge-failed { background-color: #d64545 !important; }
+.badge-queued { background-color: #b58900 !important; }
+
+.config-ok { color: #2f9e64; }
+.config-missing { color: #d64545; }

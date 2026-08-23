@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+{% block title %}Campaigns · Lead Outreach{% endblock %}
+{% block content %}
+<h4 class="mb-3">Campaigns</h4>
+<table class="table table-dark table-hover align-middle">
+    <thead><tr><th>Subject</th><th>Type</th><th>Status</th><th>Recipients</th><th>Sent</th><th>Failed</th><th>Created</th></tr></thead>
+    <tbody>
+    {% for c in campaigns %}
+        <tr>
+            <td><a href="{% url 'leads:campaign_detail' c.pk %}">{{ c.subject }}</a></td>
+            <td>{{ c.is_bulk|yesno:"Bulk,Individual" }}</td>
+            <td><span class="badge bg-secondary">{{ c.get_status_display }}</span></td>
+            <td>{{ c.recipient_count }}</td>
+            <td>{{ c.sent_count }}</td>
+            <td>{{ c.failed_count }}</td>
+            <td>{{ c.created_at }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="7" class="text-secondary">No campaigns yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

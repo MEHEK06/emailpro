@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+{% block title %}Upload CSV · EmailPro Pilot{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h4 class="mb-3">Upload contacts CSV</h4>
+            <p class="text-secondary">
+                One column named <code>email</code> (case-insensitive). Rows with invalid
+                or missing addresses are skipped and reported; duplicates inside the file
+                and against your existing contacts are automatically dropped.
+            </p>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.file }}
+                {% if form.file.errors %}
+                    <div class="text-danger small mt-1">{{ form.file.errors }}</div>
+                {% endif %}
+                <button type="submit" class="btn btn-primary mt-3">Upload & process</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

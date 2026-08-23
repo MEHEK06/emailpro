@@ -1,0 +1,14 @@
+{% extends "core/base.html" %}
+{% block title %}Unsubscribed{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4 text-center">
+            <h4>You've been unsubscribed</h4>
+            <p class="text-secondary">
+                {{ lead.email }} will no longer receive emails from this list.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

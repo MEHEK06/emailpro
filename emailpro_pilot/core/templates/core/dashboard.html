@@ -1,0 +1,85 @@
+{% extends "core/base.html" %}
+{% block title %}Dashboard · EmailPro Pilot{% endblock %}
+{% block content %}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card p-3">
+            <div class="text-secondary small">Total contacts</div>
+            <div class="display-6">{{ contact_total }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card p-3">
+            <div class="text-secondary small">Business</div>
+            <div class="display-6">{{ contact_business }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card p-3">
+            <div class="text-secondary small">Individual</div>
+            <div class="display-6">{{ contact_individual }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card p-3">
+            <div class="text-secondary small">Unclassified</div>
+            <div class="display-6">{{ contact_unclassified }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-2 mb-4">
+    <a href="{% url 'core:upload_csv' %}" class="btn btn-primary">Upload CSV</a>
+    <form method="post" action="{% url 'core:start_classification' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-light" {% if contact_unclassified == 0 %}disabled{% endif %}>
+            Classify {{ contact_unclassified }} unclassified
+        </button>
+    </form>
+    <a href="{% url 'core:campaign_create' %}" class="btn btn-outline-light">New campaign</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Recent import batches</h5>
+            {% for b in recent_batches %}
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <a href="{% url 'core:batch_detail' b.pk %}">Batch #{{ b.pk }}</a>
+                    <span class="badge bg-secondary">{{ b.get_status_display }}</span>
+                </div>
+            {% empty %}
+                <p class="text-secondary">No CSVs uploaded yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Recent classification runs</h5>
+            {% for r in recent_runs %}
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <a href="{% url 'core:classification_run_detail' r.pk %}">Run #{{ r.pk }}</a>
+                    <span class="badge bg-secondary">{{ r.get_status_display }}</span>
+                </div>
+            {% empty %}
+                <p class="text-secondary">No classification runs yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <h5>Recent campaigns</h5>
+            {% for c in recent_campaigns %}
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <a href="{% url 'core:campaign_detail' c.pk %}">{{ c.subject|truncatechars:24 }}</a>
+                    <span class="badge bg-secondary">{{ c.get_status_display }}</span>
+                </div>
+            {% empty %}
+                <p class="text-secondary">No campaigns yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

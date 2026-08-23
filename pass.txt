@@ -1,0 +1,7 @@
+app pass: fkid pbwr kygm rcmt
+admin pass: interesting
+admin name : mehek
+
+celery -A emailpro worker -l info --pool=solo> 
+with python manage.py runserver
+

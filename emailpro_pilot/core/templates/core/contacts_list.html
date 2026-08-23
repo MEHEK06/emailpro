@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% block title %}Contacts · EmailPro Pilot{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="m-0">Contacts</h4>
+    <form method="get" class="d-flex gap-2">
+        <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">All categories</option>
+            {% for value, label in categories %}
+                <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+
+<table class="table table-dark table-hover align-middle">
+    <thead><tr><th>Email</th><th>Category</th><th>Imported</th></tr></thead>
+    <tbody>
+    {% for c in contacts %}
+        <tr>
+            <td>{{ c.email }}</td>
+            <td><span class="badge badge-{{ c.category }}">{{ c.get_category_display }}</span></td>
+            <td>{{ c.created_at }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="3" class="text-secondary">No contacts match this filter.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p class="text-secondary small">Showing up to 500 contacts. Use the Django admin for full search/export.</p>
+{% endblock %}

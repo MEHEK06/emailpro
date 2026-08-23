@@ -1,0 +1,177 @@
+{% extends "core/base.html" %}
+{% block title %}Lead Outreach · EmailPro Pilot{% endblock %}
+{% block content %}
+
+{% if not smtp_configured %}
+<div class="alert alert-warning">
+    SMTP isn't configured yet — sends will be blocked until <code>GMAIL_ADDRESS</code>
+    and <code>GMAIL_APP_PASSWORD</code> are set. See <a href="{% url 'core:settings_status' %}">Settings</a>.
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card p-3">
+            <div class="text-secondary small">Total leads</div>
+            <div class="display-6">{{ total_leads }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card p-3">
+            <div class="text-secondary small">Contacted</div>
+            <div class="display-6">{{ contacted_count }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card p-3">
+            <div class="text-secondary small">Emails sent</div>
+            <div class="display-6">{{ sent_count }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card p-3">
+            <div class="text-secondary small">Failed</div>
+            <div class="display-6">{{ failed_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 mb-4">
+    <h5 class="mb-3">Import leads (CSV)</h5>
+    <form method="post" action="{% url 'leads:upload_csv' %}" enctype="multipart/form-data" class="d-flex gap-2 flex-wrap align-items-start">
+        {% csrf_token %}
+        {{ csv_form.file }}
+        <button type="submit" class="btn btn-primary">Import CSV</button>
+    </form>
+    <p class="text-secondary small mt-2 mb-0">{{ csv_form.file.help_text }}</p>
+</div>
+
+<div class="card p-4 mb-4">
+    <form method="post" action="{% url 'leads:update_template' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label fw-semibold m-0">Catalog PDF</label>
+            {% if template.catalog_pdf %}
+                <a href="{{ template.catalog_pdf.url }}" target="_blank" class="small">
+                    Uploaded — view current PDF
+                </a>
+            {% else %}
+                <span class="text-secondary small">No catalog uploaded yet</span>
+            {% endif %}
+        </div>
+        {{ template_form.catalog_pdf }}
+        {% if template_form.catalog_pdf.errors %}<div class="text-danger small">{{ template_form.catalog_pdf.errors }}</div>{% endif %}
+
+        <div class="mt-3">
+            <label class="form-label fw-semibold">Email subject</label>
+            {{ template_form.subject }}
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label fw-semibold">HTML template</label>
+            {{ template_form.html_body }}
+            <div class="form-text">
+                Available variables: <code>{{ '{{ownerName}}' }}</code>,
+                <code>{{ '{{businessName}}' }}</code>,
+                <code>{{ '{{whatsappNumber}}' }}</code>,
+                <code>{{ '{{unsubscribeUrl}}' }}</code>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-outline-light mt-3">Save template & catalog</button>
+    </form>
+</div>
+
+<div class="d-flex gap-2 mb-4">
+    <form method="get" action="{% url 'leads:campaign_preview' %}">
+        <button type="submit" class="btn btn-primary">
+            Preview & Send Bulk Email
+        </button>
+    </form>
+</div>
+<p class="text-secondary small mt-n3 mb-4">
+    Bulk send targets all valid, non-contacted, non-unsubscribed leads by default.
+    Check specific leads below to send to a custom selection instead.
+</p>
+
+<form method="get" action="{% url 'leads:campaign_preview' %}" id="lead-select-form">
+<div class="card p-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="m-0">Leads</h5>
+        <button type="submit" class="btn btn-sm btn-outline-light">Preview selected</button>
+    </div>
+    <div class="table-responsive">
+    <table class="table table-dark table-hover align-middle">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Business</th>
+                <th>Owner</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Country</th>
+                <th>Source</th>
+                <th>Score</th>
+                <th>Contacted</th>
+                <th>Status</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for lead in leads %}
+            <tr>
+                <td><input type="checkbox" name="lead_id" value="{{ lead.pk }}" class="form-check-input" {% if lead.unsubscribed %}disabled{% endif %}></td>
+                <td>{{ lead.business_name|default:"—" }}</td>
+                <td>{{ lead.owner_name|default:"—" }}</td>
+                <td>{{ lead.email }}</td>
+                <td>{{ lead.phone|default:"—" }}</td>
+                <td>{{ lead.country|default:"—" }}</td>
+                <td>{{ lead.source|default:"—" }}</td>
+                <td>{{ lead.score }}</td>
+                <td>{{ lead.contacted|yesno:"Yes,No" }}</td>
+                <td>
+                    {% if lead.unsubscribed %}
+                        <span class="badge bg-secondary">Unsubscribed</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="post" action="{% url 'leads:send_individual' lead.pk %}" onsubmit="return confirm('Send email to {{ lead.email }}?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success" {% if lead.unsubscribed %}disabled{% endif %}>Send</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="{% url 'leads:delete_lead' lead.pk %}" onsubmit="return confirm('Delete {{ lead.email }}?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="12" class="text-secondary">No leads yet — import a CSV above.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+</form>
+
+<script>
+// Turn checked "lead_id" checkboxes into the comma-separated lead_ids
+// query param the preview view expects, then submit as a GET.
+document.getElementById('lead-select-form').addEventListener('submit', function (e) {
+    var checked = Array.from(this.querySelectorAll('input[name="lead_id"]:checked')).map(function (el) { return el.value; });
+    if (checked.length > 0) {
+        var hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'lead_ids';
+        hidden.value = checked.join(',');
+        this.appendChild(hidden);
+    }
+    this.querySelectorAll('input[name="lead_id"]').forEach(function (el) { el.disabled = true; });
+});
+</script>
+
+{% endblock %}
